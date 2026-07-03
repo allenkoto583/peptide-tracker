@@ -4,6 +4,16 @@ import { useLocalStorageState } from "../hooks/useLocalStorageState.js";
 const VW = 200;
 const VH = 480;
 
+// Per-tap step (in the 200x480 space) for the mobile arrow-pad "nudge" controls.
+const NUDGE = 3;
+
+// Widen the drawn silhouette around its vertical center line (x = 100) so there's
+// more surface area to place and separate sites. This only reshapes the artwork —
+// the 200x480 coordinate space and every saved site coordinate stay untouched, so
+// previously hand-placed sites remain valid.
+const WIDEN = 1.2;
+const wx = (x) => +(100 + (x - 100) * WIDEN).toFixed(1);
+
 // Build a smooth, closed outline through a set of points (Catmull-Rom -> cubic
 // bezier). Keeps the body silhouette clean and continuous.
 function catmullRomClosed(points) {
@@ -44,9 +54,9 @@ const BODY_HALF = [
 ];
 
 const BODY_POINTS = [
-  ...BODY_HALF,
+  ...BODY_HALF.map(([x, y]) => [wx(x), y]),
   [100, 262], // crotch (center)
-  ...[...BODY_HALF].reverse().map(([x, y]) => [VW - x, y]),
+  ...[...BODY_HALF].reverse().map(([x, y]) => [VW - wx(x), y]),
 ];
 
 const BODY_PATH = catmullRomClosed(BODY_POINTS);
@@ -200,6 +210,23 @@ export default function SitesScreen({
     setSiteList((prev) => prev.map((s) => (s.id === selected ? { ...s, label } : s)));
   }
 
+  // Move the selected site a small step via the arrow pad. Clamped to the exact
+  // same bounds the drag code uses, and persisted to peptide:site-list.
+  function nudgeSelected(dx, dy) {
+    if (!selected) return;
+    setSiteList((prev) =>
+      prev.map((s) =>
+        s.id === selected
+          ? {
+              ...s,
+              x: Math.max(18, Math.min(182, s.x + dx)),
+              y: Math.max(90, Math.min(460, s.y + dy)),
+            }
+          : s
+      )
+    );
+  }
+
   function deleteSelected() {
     setSiteList((prev) => prev.filter((s) => s.id !== selected));
     setDates((prev) => { const next = { ...prev }; delete next[selected]; return next; });
@@ -293,46 +320,46 @@ export default function SitesScreen({
           onPointerDown={onSvgPointerDown} onPointerMove={onSvgPointerMove}
           onPointerUp={onSvgPointerUp} onPointerLeave={onSvgPointerUp}>
 
-          <ellipse cx="100" cy="34" rx="18" ry="22" fill="#1e293b" stroke="#4a5568" strokeWidth="1.5"/>
+          <ellipse cx="100" cy="34" rx="21" ry="22" fill="#1e293b" stroke="#4a5568" strokeWidth="1.5"/>
           <path d={bodyPath} fill="#1e293b" stroke="#4a5568" strokeWidth="1.5"/>
 
           {view === "front" && <>
             {/* collarbone */}
-            <path d="M 100 76 C 89 79, 80 80, 68 82" fill="none" stroke="#334155" strokeWidth="1"/>
-            <path d="M 100 76 C 111 79, 120 80, 132 82" fill="none" stroke="#334155" strokeWidth="1"/>
+            <path d="M 100 76 C 86.8 79, 76 80, 61.6 82" fill="none" stroke="#334155" strokeWidth="1"/>
+            <path d="M 100 76 C 113.2 79, 124 80, 138.4 82" fill="none" stroke="#334155" strokeWidth="1"/>
             {/* chest / pectoral hint */}
-            <path d="M 74 98 C 84 110, 93 112, 100 110" fill="none" stroke="#334155" strokeWidth="0.8"/>
-            <path d="M 126 98 C 116 110, 107 112, 100 110" fill="none" stroke="#334155" strokeWidth="0.8"/>
+            <path d="M 68.8 98 C 80.8 110, 91.6 112, 100 110" fill="none" stroke="#334155" strokeWidth="0.8"/>
+            <path d="M 131.2 98 C 119.2 110, 108.4 112, 100 110" fill="none" stroke="#334155" strokeWidth="0.8"/>
             {/* sternum / centerline down to navel */}
-            <path d="M 100 84 C 101 118, 99 158, 100 190" fill="none" stroke="#334155" strokeWidth="0.7"/>
+            <path d="M 100 84 C 101.2 118, 98.8 158, 100 190" fill="none" stroke="#334155" strokeWidth="0.7"/>
             {/* navel */}
             <ellipse cx="100" cy="196" rx="2.4" ry="3.4" fill="none" stroke="#4a5568" strokeWidth="1.3"/>
             {/* knee creases */}
-            <path d="M 62 356 C 66 362, 68 368, 66 374" fill="none" stroke="#334155" strokeWidth="0.7"/>
-            <path d="M 138 356 C 134 362, 132 368, 134 374" fill="none" stroke="#334155" strokeWidth="0.7"/>
+            <path d="M 54.4 356 C 59.2 362, 61.6 368, 59.2 374" fill="none" stroke="#334155" strokeWidth="0.7"/>
+            <path d="M 145.6 356 C 140.8 362, 138.4 368, 140.8 374" fill="none" stroke="#334155" strokeWidth="0.7"/>
           </>}
 
           {view === "back" && <>
             {/* spine */}
-            <path d="M 100 74 C 101 130, 99 195, 100 252" fill="none" stroke="#334155" strokeWidth="1.1"/>
+            <path d="M 100 74 C 101.2 130, 98.8 195, 100 252" fill="none" stroke="#334155" strokeWidth="1.1"/>
             {/* shoulder blades */}
-            <path d="M 84 102 C 75 110, 74 126, 83 138" fill="none" stroke="#334155" strokeWidth="0.9"/>
-            <path d="M 116 102 C 125 110, 126 126, 117 138" fill="none" stroke="#334155" strokeWidth="0.9"/>
+            <path d="M 80.8 102 C 70 110, 68.8 126, 79.6 138" fill="none" stroke="#334155" strokeWidth="0.9"/>
+            <path d="M 119.2 102 C 130 110, 131.2 126, 120.4 138" fill="none" stroke="#334155" strokeWidth="0.9"/>
             {/* lower-back dimples */}
-            <circle cx="90" cy="244" r="1.3" fill="#334155"/>
-            <circle cx="110" cy="244" r="1.3" fill="#334155"/>
+            <circle cx="88" cy="244" r="1.3" fill="#334155"/>
+            <circle cx="112" cy="244" r="1.3" fill="#334155"/>
             {/* gluteal cleft */}
             <path d="M 100 254 L 100 292" stroke="#334155" strokeWidth="1.1" fill="none"/>
             {/* gluteal folds */}
-            <path d="M 66 292 C 76 302, 90 302, 99 293" fill="none" stroke="#334155" strokeWidth="0.9"/>
-            <path d="M 134 292 C 124 302, 110 302, 101 293" fill="none" stroke="#334155" strokeWidth="0.9"/>
+            <path d="M 59.2 292 C 71.2 302, 88 302, 98.8 293" fill="none" stroke="#334155" strokeWidth="0.9"/>
+            <path d="M 140.8 292 C 128.8 302, 112 302, 101.2 293" fill="none" stroke="#334155" strokeWidth="0.9"/>
             {/* knee creases */}
-            <path d="M 62 356 C 66 362, 68 368, 66 374" fill="none" stroke="#334155" strokeWidth="0.7"/>
-            <path d="M 138 356 C 134 362, 132 368, 134 374" fill="none" stroke="#334155" strokeWidth="0.7"/>
+            <path d="M 54.4 356 C 59.2 362, 61.6 368, 59.2 374" fill="none" stroke="#334155" strokeWidth="0.7"/>
+            <path d="M 145.6 356 C 140.8 362, 138.4 368, 140.8 374" fill="none" stroke="#334155" strokeWidth="0.7"/>
           </>}
 
-          <text x="34" y="150" textAnchor="middle" fill="#64748b" fontSize="9" fontFamily="-apple-system,BlinkMacSystemFont,sans-serif">L</text>
-          <text x="166" y="150" textAnchor="middle" fill="#64748b" fontSize="9" fontFamily="-apple-system,BlinkMacSystemFont,sans-serif">R</text>
+          <text x="22" y="150" textAnchor="middle" fill="#64748b" fontSize="9" fontFamily="-apple-system,BlinkMacSystemFont,sans-serif">L</text>
+          <text x="178" y="150" textAnchor="middle" fill="#64748b" fontSize="9" fontFamily="-apple-system,BlinkMacSystemFont,sans-serif">R</text>
 
           {viewSites.map((site) => {
             const days   = daysSince(dates[site.id] ?? null);
@@ -371,29 +398,39 @@ export default function SitesScreen({
       </div>
 
       {editMode && selectedSite && (
-        <div className="site-popover">
-          <div className="site-popover-header">
-            <span className="form-label">Editing: {selectedSite.label}</span>
-            <button className="link-button" onClick={() => { setSelected(null); setConfirmDel(false); }}>{"✕"}</button>
+        <div className="site-nudge-panel" role="group" aria-label={`Edit ${selectedSite.label}`}>
+          <div className="site-nudge-row">
+            <input className="form-input site-nudge-name" value={selectedSite.label}
+              onChange={(e) => renameSelected(e.target.value)} placeholder="Site name"/>
+            <button className="primary-button site-nudge-done"
+              onClick={() => { setSelected(null); setConfirmDel(false); }}>Done</button>
           </div>
-          <label className="form-field">
-            <span className="form-label">Name</span>
-            <input className="form-input" value={selectedSite.label}
-              onChange={(e) => renameSelected(e.target.value)} placeholder="Site name" autoFocus/>
-          </label>
-          {!confirmDel ? (
-            <button className="danger-button" onClick={() => setConfirmDel(true)}>Delete this site</button>
-          ) : (
-            <div className="danger-confirm">
-              <p className="muted" style={{ margin: "0 0 8px", fontSize: "0.85rem" }}>
-                Delete "{selectedSite.label}"? This will clear its injection history.
-              </p>
-              <div className="sites-confirm-actions">
-                <button className="danger-button" onClick={deleteSelected}>Yes, delete</button>
-                <button className="link-button" style={{ color: "var(--text)" }} onClick={() => setConfirmDel(false)}>Cancel</button>
-              </div>
+
+          <div className="site-nudge-controls">
+            <div className="nudge-pad" role="group" aria-label="Move site">
+              <button className="nudge-btn nudge-up"    onClick={() => nudgeSelected(0, -NUDGE)} aria-label="Move up">{"▲"}</button>
+              <button className="nudge-btn nudge-left"  onClick={() => nudgeSelected(-NUDGE, 0)} aria-label="Move left">{"◀"}</button>
+              <span   className="nudge-center" aria-hidden="true">{"✚"}</span>
+              <button className="nudge-btn nudge-right" onClick={() => nudgeSelected(NUDGE, 0)}  aria-label="Move right">{"▶"}</button>
+              <button className="nudge-btn nudge-down"  onClick={() => nudgeSelected(0, NUDGE)}  aria-label="Move down">{"▼"}</button>
             </div>
-          )}
+
+            <div className="site-nudge-side">
+              {!confirmDel ? (
+                <button className="danger-button" onClick={() => setConfirmDel(true)}>Delete site</button>
+              ) : (
+                <div className="danger-confirm">
+                  <p className="muted" style={{ margin: "0 0 8px", fontSize: "0.85rem" }}>
+                    Delete "{selectedSite.label}"? This will clear its injection history.
+                  </p>
+                  <div className="sites-confirm-actions">
+                    <button className="danger-button" onClick={deleteSelected}>Yes, delete</button>
+                    <button className="link-button" style={{ color: "var(--text)" }} onClick={() => setConfirmDel(false)}>Cancel</button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
 

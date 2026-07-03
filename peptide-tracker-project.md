@@ -56,7 +56,7 @@ All my data saves on my device and survives closing/reopening the app. Keep my h
 
 # Build log & decisions (kept up to date)
 
-_Last updated: June 30, 2026 (dose logging + stack editing)_
+_Last updated: June 30, 2026 (SHIPPED — PWA + GitHub Pages deploy)_
 
 ## Decisions locked in
 
@@ -95,14 +95,32 @@ _Last updated: June 30, 2026 (dose logging + stack editing)_
   - **Bug fixed during this step:** site "last injected" dates (`peptide:sites`) used to live inside SitesScreen, so logging-then-navigating unmounted the screen before its save ran and the site never turned red. Fixed by lifting the `sites` dates store up to App.jsx (always mounted), passed into SitesScreen as props — matching how `doses` is handled.
 - [x] **Enhancement — In-place protocol editing:** each Stack card has an Edit button opening an inline form pre-filled with current values (dose, vial mg, water mL, timing, schedule, cycle, shelf-life, notes). Saving applies only changed fields via the existing `updateItem(id, changes)`; the item id, reconstitution date, and logged history are preserved. Lets you bump a dose mid-cycle (e.g. 2 mg → 4 mg) with draw-units recomputing automatically.
 
-## Remaining milestones (in order)
+- [x] **Polish — installable PWA:** wired up with `vite-plugin-pwa` (`vite.config.js`, `registerType: 'autoUpdate'`, manifest with name/short_name/theme, icon set in `public/icons/`). iOS `<head>` tags in `index.html` (apple-touch-icon, apple-mobile-web-app-capable, status-bar style, title). `main.jsx` requests persistent storage on startup. App shell precached for offline. Disclaimer stays in the footer.
+- [x] **Deployed & live:** shipped to GitHub Pages. **Live URL: https://allenkoto583.github.io/peptide-tracker/** — installed on iPhone via Safari → Share → Add to Home Screen (persistent storage granted on install).
 
-1. **Polish** — PWA manifest + icons, persistent storage prompt, disclaimer banner ← next
-2. **Deploy to iPhone** via GitHub Pages, then end-to-end verification on Safari / Home Screen
+## Status: SHIPPED
+
+All six core features plus dose logging and in-place editing are built, and the app is live and installed on the iPhone. Data is stored locally per-device (localStorage) — no cloud, no accounts. Each user (e.g. a friend who installs from the same URL) gets their own private local data; installs never share or overwrite each other. Trade-off: no cross-device sync, and clearing Safari storage / deleting the app loses that device's data.
+
+## Deploy & update runbook
+
+- **Repo:** https://github.com/allenkoto583/peptide-tracker (public). Git is rooted in the project folder itself (`git init` was run here), so only the peptide app is published — the other projects under `C:/Users/allen/claude` were NOT included. Git user/email already configured for this repo.
+- **Auto-deploy:** a GitHub Actions workflow at `.github/workflows/deploy.yml` rebuilds and publishes to Pages on every push to `main` (~40 seconds). Pages source is "GitHub Actions".
+- **To publish an update** — make + test changes locally, then from the project folder:
+
+  ```
+  git add -A
+  git commit -m "describe your change"
+  git push
+  ```
+
+  The workflow redeploys automatically. On the phone the PWA auto-updates (`registerType: 'autoUpdate'`) — may take reopening the app once or twice. Updating code does NOT erase saved data (storage is tied to the URL, not the app version).
+- **Local PWA check before pushing:** run `npm run preview` (NOT `npm run dev` — the service worker only registers on a served build), open the printed URL (~`http://localhost:4173`) in Chrome, press F12 → **Application** tab → confirm the Manifest is populated and Service Worker `sw.js` is activated. Toggle Network → Offline and reload to confirm the shell loads. "Persistent storage denied" on the desktop preview is EXPECTED; iOS grants it automatically once the app is added to the Home Screen.
+- **Known minor notes (non-blocking):** GitHub Actions warns about Node 20 deprecation on runners (builds still pass); `npm audit` flags 2 dev-only vulnerabilities from the PWA plugin's build tooling (not shipped to users). Both can be addressed later.
 
 ## How to resume a session
 
 1. Open the "Peptide App" folder in VS Code.
 2. To preview locally: open a terminal and run `npm run dev`, then open the localhost link.
 3. To build: open a second terminal and run `claude`.
-4. In a new Cowork chat (Sonnet), say "continue the peptide app — Features 1–5 plus dose logging and in-place stack editing are all done. Next is Polish (PWA manifest/icons, persistent storage, disclaimer), then deploy to iPhone via GitHub Pages."
+4. In a new Cowork chat (Sonnet), say "continue the peptide app — it's fully shipped and live at https://allenkoto583.github.io/peptide-tracker/. I want to [add/change X]." Then publish with `git add -A && git commit -m "..." && git push` to redeploy.
