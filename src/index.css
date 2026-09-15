@@ -984,6 +984,9 @@ body {
 /* ----- Bacteriostatic water card (top of My Stack) ----- */
 .bac-card {
   border-left: 3px solid var(--accent);
+  /* .card carries no bottom margin, so without this the card sits flush
+     against the "+ Add peptide" header row below it. */
+  margin-bottom: 18px;
 }
 
 .bac-hint {
