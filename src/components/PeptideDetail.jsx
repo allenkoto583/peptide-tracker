@@ -21,6 +21,16 @@ function formatDose(dose) {
   return `${dose.min}–${dose.max} ${dose.unit}${per}`;
 }
 
+// The structured cycle numbers, shown so it's visible where the pre-filled
+// values in the add-to-stack form come from.
+function formatCycle(cycle) {
+  if (!cycle) return null;
+  const headline = cycle.continuous
+    ? "Normally run continuously (not cycled)."
+    : `About ${cycle.onDays} days on, then ~${cycle.offDays} days off.`;
+  return cycle.note ? `${headline} ${cycle.note}` : headline;
+}
+
 function formatVial(vial) {
   if (!vial) return null;
   const sizes =
@@ -69,6 +79,7 @@ export default function PeptideDetail({ peptide, onBack }) {
         <Field label="Common timing">{p.timing}</Field>
         <Field label="Typical frequency">{p.frequency}</Field>
         <Field label="Typical cycle length">{p.cycleLength}</Field>
+        <Field label="Cycle used as the default">{formatCycle(p.cycle)}</Field>
 
         {p.shelfLife && (
           <Field label="Beyond-use / shelf life">

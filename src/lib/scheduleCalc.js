@@ -8,18 +8,69 @@
 //   { type: "weeklyDays", days: [1,4] }   // 0=Sun … 6=Sat (calendar days)
 //   { type: "timesPerWeek", count: 2 }    // evenly spread across each 7-day
 //                                         // window of the cycle
+//
+// Two other fields on a stack item shape the on/off cycle:
+//   continuous  boolean  true = never cycles; always active, never rests
+//   restDays    number   days off after the "on" block finishes (0 = none)
 // ---------------------------------------------------------------------------
 
 import { dayOfCycle, daysRemaining } from "./doseCalc.js";
 
-// "upcoming" | "active" | "complete"
+// "upcoming" | "active" | "resting" | "complete"
+//
+// "resting" is the off phase of a cycle — the on block is done but the rest
+// period hasn't finished yet. Once rest is over the item becomes "complete",
+// which now reads as "ready to start the next cycle".
+//
+// Items with no restDays skip "resting" entirely and behave exactly as they
+// did before off-cycle tracking existed.
 export function cycleStatusOf(item, today = new Date()) {
+  // Continuously-run compounds (the GLP-1s) never cycle or rest.
+  if (item.continuous) return "active";
+
   const day = dayOfCycle(item.cycleStart, today);
   if (day == null) return "active"; // no start date → treat as always active
   if (day < 1) return "upcoming";
+
   const rem = daysRemaining(item.cycleStart, item.cycleLengthDays, today);
-  if (rem != null && rem < 0) return "complete";
-  return "active";
+  if (rem == null || rem >= 0) return "active"; // day 60 of 60 is still active
+
+  const restDay = restDayOf(item, today);
+  const restDays = Number(item.restDays) || 0;
+  if (restDays > 0 && restDay != null && restDay <= restDays) return "resting";
+  return "complete";
+}
+
+// ----- Rest-phase helpers ---------------------------------------------------
+
+// Which day of the rest period is it? The first day after the cycle ends is
+// rest day 1. Returns null before the on-block is over (or with no dates).
+export function restDayOf(item, today = new Date()) {
+  const day = dayOfCycle(item.cycleStart, today);
+  if (day == null || !item.cycleLengthDays) return null;
+  const restDay = day - item.cycleLengthDays;
+  return restDay > 0 ? restDay : null;
+}
+
+// How many rest days are left? 0 means rest finishes today.
+export function restDaysRemaining(item, today = new Date()) {
+  const restDay = restDayOf(item, today);
+  const restDays = Number(item.restDays) || 0;
+  if (restDay == null || !restDays) return null;
+  return Math.max(0, restDays - restDay);
+}
+
+// The calendar date the next cycle can start: cycleStart + onDays + restDays.
+// Returned as a local "yyyy-mm-dd" string, or null if it can't be worked out.
+export function nextCycleDate(item) {
+  if (!item.cycleStart || !item.cycleLengthDays) return null;
+  const restDays = Number(item.restDays) || 0;
+  const [y, m, d] = item.cycleStart.split("-").map(Number);
+  // cycleStart is day 1, so the day after the whole on+off block is
+  // start + onDays + restDays.
+  const next = new Date(y, m - 1, d + item.cycleLengthDays + restDays);
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${next.getFullYear()}-${pad(next.getMonth() + 1)}-${pad(next.getDate())}`;
 }
 
 // Is today an injection day for this item?

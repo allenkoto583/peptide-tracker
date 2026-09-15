@@ -41,6 +41,8 @@ function draftFrom(item) {
     schedule: item.schedule ?? { type: "daily" },
     cycleStart: item.cycleStart ?? "",
     cycleLengthDays: item.cycleLengthDays ?? "",
+    restDays: item.restDays ?? 0,
+    continuous: !!item.continuous,
     shelfLifeDays: item.shelfLifeDays ?? "",
     notes: item.notes ?? "",
   };
@@ -66,10 +68,13 @@ export default function EditStackItemForm({ item, onSave, onCancel }) {
   // saved item, so onUpdate merges nothing it doesn't need to.
   function buildChanges() {
     const changes = {};
-    const numFields = ["doseValue", "vialMg", "waterMl", "cycleLengthDays", "shelfLifeDays"];
+    const numFields = [
+      "doseValue", "vialMg", "waterMl", "cycleLengthDays", "restDays", "shelfLifeDays",
+    ];
     for (const key of numFields) {
       if (Number(fields[key]) !== Number(item[key])) changes[key] = Number(fields[key]);
     }
+    if (!!fields.continuous !== !!item.continuous) changes.continuous = !!fields.continuous;
     if (fields.doseUnit !== (item.doseUnit ?? "mg")) changes.doseUnit = fields.doseUnit;
     if (fields.timing !== (item.timing ?? "")) changes.timing = fields.timing;
     if (fields.cycleStart !== (item.cycleStart ?? "")) changes.cycleStart = fields.cycleStart;
@@ -217,19 +222,52 @@ export default function EditStackItemForm({ item, onSave, onCancel }) {
         </label>
       )}
 
-      <div className="form-row">
-        <label className="form-field">
-          <span className="form-label">Cycle length (days)</span>
+      <fieldset className="form-section">
+        <legend className="form-section-title">Cycle &amp; rest</legend>
+
+        <label className="form-check">
           <input
-            className="form-input"
-            type="number"
-            inputMode="numeric"
-            min="1"
-            step="1"
-            value={fields.cycleLengthDays}
-            onChange={(e) => set("cycleLengthDays", e.target.value)}
+            type="checkbox"
+            checked={fields.continuous}
+            onChange={(e) => set("continuous", e.target.checked)}
           />
+          <span>Run continuously (no cycling, no rest period)</span>
         </label>
+
+        {fields.continuous ? (
+          <p className="form-hint muted">
+            This will stay active on your Today list indefinitely — it never
+            enters a rest period or finishes a cycle.
+          </p>
+        ) : (
+          <div className="form-row">
+            <label className="form-field">
+              <span className="form-label">Cycle length (days on)</span>
+              <input
+                className="form-input"
+                type="number"
+                inputMode="numeric"
+                min="1"
+                step="1"
+                value={fields.cycleLengthDays}
+                onChange={(e) => set("cycleLengthDays", e.target.value)}
+              />
+            </label>
+            <label className="form-field">
+              <span className="form-label">Rest days after</span>
+              <input
+                className="form-input"
+                type="number"
+                inputMode="numeric"
+                min="0"
+                step="1"
+                value={fields.restDays}
+                onChange={(e) => set("restDays", e.target.value)}
+              />
+            </label>
+          </div>
+        )}
+
         <label className="form-field">
           <span className="form-label">Cycle start</span>
           <input
@@ -239,7 +277,7 @@ export default function EditStackItemForm({ item, onSave, onCancel }) {
             onChange={(e) => set("cycleStart", e.target.value)}
           />
         </label>
-      </div>
+      </fieldset>
 
       <label className="form-field">
         <span className="form-label">Shelf life (days)</span>

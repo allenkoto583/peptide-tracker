@@ -36,7 +36,19 @@
 //   storageNotes        string  fridge/freezer guidance
 //   timing              string  common time-of-day practice
 //   frequency           string  how often it's commonly taken
-//   cycleLength         string  typical on/off cycle range
+//   cycleLength         string  typical on/off cycle range (human-readable)
+//
+//   cycle: {               // the same cycle info as NUMBERS, so the app can
+//                          // pre-fill a stack item and count down a rest period
+//     onDays     number    // commonly cited length of the "on" block, in days
+//     offDays    number    // commonly cited rest/off period between blocks
+//     continuous boolean   // true = normally run continuously, not cycled
+//     note       string    // how onDays/offDays were picked from the range
+//   }
+//
+// NOTE: `cycle` numbers are derived from the `cycleLength` prose above them —
+// where the prose gives a range, a midpoint is used and recorded in `note`.
+// They are starting points for the add-to-stack form, not recommendations.
 //
 //   shelfLife: {                  // beyond-use estimates after reconstitution
 //     reconstitutedFridgeDays number   default beyond-use window in fridge
@@ -77,6 +89,12 @@ export const peptides = [
     frequency: "Once weekly (long-acting).",
     cycleLength:
       "Run continuously with slow titration in trials; community use often follows multi-month blocks. No standardized cycle.",
+    cycle: {
+      onDays: 90,
+      offDays: 30,
+      continuous: true,
+      note: "Trials titrate continuously rather than cycling, so this is marked continuous. The on/off numbers are only a fallback if you choose to cycle it.",
+    },
     shelfLife: {
       reconstitutedFridgeDays: 30,
       lyophilizedNote:
@@ -130,6 +148,12 @@ export const peptides = [
     frequency:
       "Often once to a few times daily depending on goals; nightly is common.",
     cycleLength: "Commonly run in blocks of about 8–12 weeks, then a break.",
+    cycle: {
+      onDays: 70,
+      offDays: 28,
+      continuous: false,
+      note: "8–12 week blocks; 10 weeks (70 days) used as the midpoint default, with a ~4 week break.",
+    },
     shelfLife: {
       reconstitutedFridgeDays: 30,
       lyophilizedNote:
@@ -176,6 +200,12 @@ export const peptides = [
       "Common practice is a weekly total of about 5–10 mg, usually split into one or two 5 mg subcutaneous injections on non-consecutive days rather than daily. Human dosing is not established.",
     cycleLength:
       "Frequently run in 8–12 week cycles at roughly 5–10 mg per week, then a break.",
+    cycle: {
+      onDays: 70,
+      offDays: 28,
+      continuous: false,
+      note: "8–12 week cycles; 10 weeks (70 days) used as the midpoint default, with a ~4 week break.",
+    },
     shelfLife: {
       reconstitutedFridgeDays: 30,
       lyophilizedNote:
@@ -232,6 +262,12 @@ export const peptides = [
       "BPC-157 often daily (1–2×); TB-500 often a couple times per week with a loading phase, then maintenance.",
     cycleLength:
       "Commonly run for about 4–8 weeks during an acute recovery block, then stopped.",
+    cycle: {
+      onDays: 42,
+      offDays: 28,
+      continuous: false,
+      note: "4–8 week recovery blocks; 6 weeks (42 days) used as the midpoint default.",
+    },
     shelfLife: {
       reconstitutedFridgeDays: 30,
       lyophilizedNote:
@@ -277,6 +313,12 @@ export const peptides = [
     frequency: "Typically once daily.",
     cycleLength:
       "Often run continuously for several months in clinical use; community use varies.",
+    cycle: {
+      onDays: 84,
+      offDays: 28,
+      continuous: false,
+      note: "Clinical use is continuous over months; 12 weeks (84 days) used as a default block since community use is typically cycled.",
+    },
     shelfLife: {
       reconstitutedFridgeDays: 14,
       lyophilizedNote:
@@ -322,6 +364,12 @@ export const peptides = [
     frequency: "Once weekly (long-acting).",
     cycleLength:
       "Generally taken continuously for weight management rather than cycled.",
+    cycle: {
+      onDays: 90,
+      offDays: 30,
+      continuous: true,
+      note: "Taken continuously for weight management, so this is marked continuous. The on/off numbers are only a fallback if you choose to cycle it.",
+    },
     shelfLife: {
       reconstitutedFridgeDays: 28,
       lyophilizedNote:
@@ -366,6 +414,12 @@ export const peptides = [
     timing: "Timing is flexible; often dosed in the evening.",
     frequency: "Often daily or several times per week.",
     cycleLength: "Commonly run in blocks of about 4–8 weeks.",
+    cycle: {
+      onDays: 42,
+      offDays: 28,
+      continuous: false,
+      note: "4–8 week blocks; 6 weeks (42 days) used as the midpoint default.",
+    },
     shelfLife: {
       reconstitutedFridgeDays: 30,
       lyophilizedNote:
@@ -412,6 +466,12 @@ export const peptides = [
     frequency:
       "Often once daily, frequently run 5 days on / 2 days off.",
     cycleLength: "Commonly run in blocks of about 8 weeks on / 8 weeks off.",
+    cycle: {
+      onDays: 56,
+      offDays: 56,
+      continuous: false,
+      note: "The cited protocol states 8 weeks on / 8 weeks off explicitly — no midpoint needed.",
+    },
     shelfLife: {
       reconstitutedFridgeDays: 14,
       lyophilizedNote:
@@ -457,6 +517,12 @@ export const peptides = [
     timing: "Timing is flexible; often dosed once daily.",
     frequency: "Often daily.",
     cycleLength: "Commonly run in blocks of about 4–8 weeks.",
+    cycle: {
+      onDays: 42,
+      offDays: 28,
+      continuous: false,
+      note: "4–8 week blocks; 6 weeks (42 days) used as the midpoint default.",
+    },
     shelfLife: {
       reconstitutedFridgeDays: 30,
       lyophilizedNote:
@@ -498,6 +564,12 @@ export const peptides = [
     timing: "Timing is flexible; often dosed once daily.",
     frequency: "Often daily.",
     cycleLength: "Commonly run in blocks of about 4–8 weeks.",
+    cycle: {
+      onDays: 42,
+      offDays: 28,
+      continuous: false,
+      note: "4–8 week blocks; 6 weeks (42 days) used as the midpoint default.",
+    },
     shelfLife: {
       reconstitutedFridgeDays: 30,
       lyophilizedNote:
@@ -539,6 +611,12 @@ export const peptides = [
     timing: "Timing is flexible; often dosed in the evening.",
     frequency: "Often daily or 3–5 times per week.",
     cycleLength: "Commonly run in blocks of about 4–8 weeks.",
+    cycle: {
+      onDays: 42,
+      offDays: 28,
+      continuous: false,
+      note: "4–8 week blocks; 6 weeks (42 days) used as the midpoint default.",
+    },
     shelfLife: {
       reconstitutedFridgeDays: 30,
       lyophilizedNote:
@@ -580,6 +658,12 @@ export const peptides = [
     timing: "Timing is flexible.",
     frequency: "Commonly daily up to 5x/week (lower dose) or 2–3x/week (higher dose).",
     cycleLength: "Commonly run in blocks of about 4–12 weeks.",
+    cycle: {
+      onDays: 56,
+      offDays: 28,
+      continuous: false,
+      note: "4–12 week blocks; 8 weeks (56 days) used as the midpoint default.",
+    },
     shelfLife: {
       reconstitutedFridgeDays: 30,
       lyophilizedNote:
@@ -622,6 +706,12 @@ export const peptides = [
     frequency: "Once daily during a course.",
     cycleLength:
       "Run as a short course of about 10–20 consecutive days, then a long gap — typically repeated only ~1–2 times per year (roughly 4–6 months between courses).",
+    cycle: {
+      onDays: 20,
+      offDays: 150,
+      continuous: false,
+      note: "Short 10–20 day course (20 used as the upper end), then a long gap — 5 months (150 days) as the midpoint of the cited 4–6 month break. Much longer off-period than most peptides here.",
+    },
     shelfLife: {
       reconstitutedFridgeDays: 30,
       lyophilizedNote:
@@ -663,6 +753,12 @@ export const peptides = [
     timing: "Timing is flexible; many dose earlier in the day.",
     frequency: "Commonly 2–3 times per week.",
     cycleLength: "Often run continuously or in blocks; no standardized cycle.",
+    cycle: {
+      onDays: 56,
+      offDays: 28,
+      continuous: false,
+      note: "No standardized cycle — an 8 week on / 4 week off block is offered as a starting point. Some run it continuously instead; tick the continuous box if that's you.",
+    },
     shelfLife: {
       reconstitutedFridgeDays: 30,
       lyophilizedNote:
@@ -673,6 +769,110 @@ export const peptides = [
       {
         label: "Empower Pharmacy — NAD+ injection",
         url: "https://www.empowerpharmacy.com/compounding-pharmacy/nad-injection/",
+      },
+    ],
+  },
+
+  {
+    id: "kpv",
+    name: "KPV",
+    aliases: ["Lys-Pro-Val", "K-P-V", "KPV peptide", "alpha-MSH fragment"],
+    category: "Anti-inflammatory tripeptide",
+    isBlend: false,
+    purpose:
+      "The C-terminal tripeptide (lysine-proline-valine) of alpha-MSH, which carries much of that hormone's anti-inflammatory activity. Studied for inflammatory bowel conditions, skin inflammation, and mast-cell-driven irritation. Evidence is preclinical — largely cell and mouse models.",
+    vial: {
+      typicalMg: 10,
+      commonMg: [5, 10],
+      reconSolvent: "Bacteriostatic water",
+      reconMl: 2,
+    },
+    dose: {
+      min: 200,
+      max: 500,
+      unit: "mcg",
+      perDose: true,
+    },
+    reconstitutionNotes:
+      "IMPORTANT — route: KPV is very commonly used ORALLY (capsules) or TOPICALLY rather than injected, especially for gut and skin goals; the research on intestinal inflammation used oral delivery via the PepT1 transporter. The dose range and the draw calculator here assume subcutaneous injection, so they do not apply to oral or topical use. If injecting, reconstitute with bacteriostatic water added slowly down the vial wall and swirl gently — do not shake.",
+    storageNotes:
+      "Refrigerate after reconstitution and protect from light. Lyophilized powder keeps well frozen.",
+    timing:
+      "Timing is flexible; often dosed in the evening, or near a meal when the goal is gut-related.",
+    frequency: "Often once daily.",
+    cycleLength: "Commonly run in blocks of about 4–8 weeks.",
+    cycle: {
+      onDays: 28,
+      offDays: 28,
+      continuous: false,
+      note: "4–8 week blocks; 4 weeks (28 days) used as the default since KPV is often run as a short anti-inflammatory course.",
+    },
+    shelfLife: {
+      reconstitutedFridgeDays: 30,
+      lyophilizedNote:
+        "Lyophilized powder is stable for months to years frozen and protected from light.",
+      note: "Discard if cloudy, discolored, or past its beyond-use window.",
+    },
+    sources: [
+      {
+        label:
+          "PubMed — PepT1-mediated tripeptide KPV uptake reduces intestinal inflammation (Dalmasso et al., Gastroenterology 2008)",
+        url: "https://pubmed.ncbi.nlm.nih.gov/18061177/",
+      },
+      {
+        label:
+          "PubMed — Melanocortin-derived tripeptide KPV has anti-inflammatory potential in murine models of IBD (Kannengiesser et al., 2008)",
+        url: "https://pubmed.ncbi.nlm.nih.gov/18092346/",
+      },
+    ],
+  },
+
+  {
+    id: "ipamorelin",
+    name: "Ipamorelin",
+    aliases: ["Ipa", "NNC 26-0161", "Ipamorelin acetate"],
+    category: "Growth hormone secretagogue (GHRP)",
+    isBlend: false,
+    purpose:
+      "A selective growth-hormone-releasing peptide (ghrelin receptor agonist) that stimulates the body's own GH release. Notable for being selective — unlike older GHRPs it does not meaningfully raise cortisol or prolactin. Used for recovery, sleep quality, and body composition. Often paired with a GHRH analog like CJC-1295, but also run on its own.",
+    vial: {
+      typicalMg: 5,
+      commonMg: [2, 5, 10],
+      reconSolvent: "Bacteriostatic water",
+      reconMl: 2,
+    },
+    dose: {
+      min: 100,
+      max: 300,
+      unit: "mcg",
+      perDose: true,
+    },
+    reconstitutionNotes:
+      "Reconstitute with bacteriostatic water, adding slowly down the vial wall and swirling gently — do not shake. A frequently cited practice is ~100–300 mcg per injection. Ipamorelin is short-acting, which is why it is often split into more than one dose per day.",
+    storageNotes:
+      "Refrigerate after reconstitution and protect from light. Lyophilized powder can be frozen for longer-term storage.",
+    timing:
+      "Commonly injected at night before bed (to align with natural GH pulses) and/or post-workout, on an empty stomach.",
+    frequency:
+      "Often once to three times daily depending on goals; nightly alone is common.",
+    cycleLength: "Commonly run in blocks of about 8–12 weeks, then a break.",
+    cycle: {
+      onDays: 70,
+      offDays: 28,
+      continuous: false,
+      note: "8–12 week blocks; 10 weeks (70 days) used as the midpoint default, with a ~4 week break.",
+    },
+    shelfLife: {
+      reconstitutedFridgeDays: 30,
+      lyophilizedNote:
+        "Lyophilized powder is stable for many months frozen and protected from light.",
+      note: "Discard if cloudy, discolored, or past its beyond-use window.",
+    },
+    sources: [
+      {
+        label:
+          "PubMed — Ipamorelin, the first selective growth hormone secretagogue (Raun et al., 1998)",
+        url: "https://pubmed.ncbi.nlm.nih.gov/9849822/",
       },
     ],
   },

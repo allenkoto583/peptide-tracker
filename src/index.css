@@ -430,6 +430,7 @@ body {
   background: var(--surface-2);
   border-radius: 999px;
   overflow: hidden;
+  display: flex;
 }
 
 .cycle-fill {
@@ -438,9 +439,27 @@ body {
   border-radius: 999px;
 }
 
+/* When a rest phase follows the on phase the two fills sit side by side, so
+   square off the junction between them. */
+.cycle-bar-2phase .cycle-fill {
+  border-radius: 999px 0 0 999px;
+}
+
+.cycle-fill-rest {
+  height: 100%;
+  background: var(--muted);
+  border-radius: 0 999px 999px 0;
+}
+
 .cycle-text {
   margin-top: 6px;
   font-size: 0.8rem;
+}
+
+.cycle-restart-btn {
+  margin-top: 10px;
+  font-size: 0.85rem;
+  padding: 7px 14px;
 }
 
 /* ----- Feature 3: Reconstitution tracker ----- */
@@ -923,4 +942,99 @@ body {
   color: var(--text);
   font-weight: 600;
   white-space: nowrap;
+}
+
+/* ===== New features: BAC water tracker + cycle rest tracking ============== */
+
+/* ----- Shared form grouping (Cycle & rest section) ----- */
+.form-section {
+  border: 1px solid var(--surface-2);
+  border-radius: 10px;
+  padding: 12px 14px 14px;
+  margin: 4px 0 2px;
+  min-width: 0;
+}
+
+.form-section-title {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  padding: 0 6px;
+}
+
+.form-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  font-size: 0.88rem;
+  line-height: 1.35;
+  margin: 2px 0 10px;
+  cursor: pointer;
+}
+
+.form-check input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  flex-shrink: 0;
+  accent-color: var(--accent);
+}
+
+/* ----- Bacteriostatic water card (top of My Stack) ----- */
+.bac-card {
+  border-left: 3px solid var(--accent);
+}
+
+.bac-hint {
+  font-size: 0.8rem;
+  margin: 6px 0 0;
+  line-height: 1.4;
+}
+
+.bac-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.bac-expiry-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.bac-expiry-input {
+  max-width: 110px;
+}
+
+.bac-new-btn {
+  padding-left: 0;
+  padding-right: 0;
+  white-space: nowrap;
+}
+
+.today-bac-banner {
+  margin-bottom: 14px;
+}
+
+/* ----- Resting / ready-to-restart rows on Today ----- */
+.today-rest-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.today-restart-btn {
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-size: 0.8rem;
+  padding: 6px 12px;
 }

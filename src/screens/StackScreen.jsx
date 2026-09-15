@@ -1,28 +1,27 @@
 import { useState } from "react";
 import { peptides } from "../data/peptides.js";
-import { useLocalStorageState } from "../hooks/useLocalStorageState.js";
 import AddToStackForm from "../components/AddToStackForm.jsx";
 import StackItemCard from "../components/StackItemCard.jsx";
+import BacWaterCard from "../components/BacWaterCard.jsx";
 
-// The My Stack screen owns the saved stack (persisted to localStorage) and a
-// flag for whether the "add" form is open.
-export default function StackScreen() {
-  const [stack, setStack] = useLocalStorageState("stack", []);
+// The My Stack screen renders the saved stack and the bacteriostatic water
+// tracker. The stack itself lives in App.jsx (Today can write it too, so one
+// owner avoids two states racing the same localStorage key); this screen only
+// owns the flag for whether the "add" form is open.
+export default function StackScreen({
+  stack,
+  onAdd,
+  onRemove,
+  onUpdate,
+  onStartNextCycle,
+  bacWater,
+  setBacWater,
+}) {
   const [adding, setAdding] = useState(false);
 
-  function addItem(item) {
-    setStack((prev) => [...prev, item]);
+  function handleAdd(item) {
+    onAdd(item);
     setAdding(false);
-  }
-
-  function removeItem(id) {
-    setStack((prev) => prev.filter((it) => it.id !== id));
-  }
-
-  function updateItem(id, changes) {
-    setStack((prev) =>
-      prev.map((it) => (it.id === id ? { ...it, ...changes } : it))
-    );
   }
 
   // While adding, the form takes over the whole screen.
@@ -30,7 +29,7 @@ export default function StackScreen() {
     return (
       <AddToStackForm
         peptides={peptides}
-        onAdd={addItem}
+        onAdd={handleAdd}
         onCancel={() => setAdding(false)}
       />
     );
@@ -38,6 +37,10 @@ export default function StackScreen() {
 
   return (
     <div>
+      {/* Pinned above the stack so it's visible whether or not you have
+          peptides saved — the water bottle ages either way. */}
+      <BacWaterCard bacWater={bacWater} setBacWater={setBacWater} />
+
       <div className="stack-header">
         <p className="muted" style={{ margin: 0 }}>
           {stack.length === 0
@@ -57,7 +60,13 @@ export default function StackScreen() {
       ) : (
         <div className="stack-list">
           {stack.map((item) => (
-            <StackItemCard key={item.id} item={item} onRemove={removeItem} onUpdate={updateItem} />
+            <StackItemCard
+              key={item.id}
+              item={item}
+              onRemove={onRemove}
+              onUpdate={onUpdate}
+              onStartNextCycle={onStartNextCycle}
+            />
           ))}
         </div>
       )}

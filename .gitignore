@@ -5,3 +5,6 @@ dist
 
 # stray asset, not part of the app
 human gray scale.jpg
+
+# per-machine Claude Code settings (contains local absolute paths)
+.claude/settings.local.json

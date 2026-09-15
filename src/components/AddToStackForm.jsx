@@ -16,7 +16,9 @@ function todayISO() {
   return new Date(d.getTime() - offsetMs).toISOString().slice(0, 10);
 }
 
-// Pull a peptide's library values in as starting points for the form.
+// Pull a peptide's library values in as starting points for the form. The
+// cycle block gives researched on/off day counts per peptide (see the header
+// of src/data/peptides.js); 30/30 is only a fallback for entries without one.
 function defaultsFor(p) {
   return {
     vialMg: p.vial?.typicalMg ?? "",
@@ -25,7 +27,9 @@ function defaultsFor(p) {
     doseUnit: p.dose?.unit ?? "mg",
     timing: p.timing ?? "",
     frequency: p.frequency ?? "",
-    cycleLengthDays: 30,
+    cycleLengthDays: p.cycle?.onDays ?? 30,
+    restDays: p.cycle?.offDays ?? 30,
+    continuous: !!p.cycle?.continuous,
     cycleStart: todayISO(),
     notes: "",
     schedule: { type: "daily" },
@@ -110,6 +114,9 @@ export default function AddToStackForm({ peptides, onAdd, onCancel }) {
       timing: fields.timing,
       frequency: fields.frequency,
       cycleLengthDays: Number(fields.cycleLengthDays),
+      restDays: Number(fields.restDays) || 0,
+      continuous: !!fields.continuous,
+      cycleNumber: 1,
       cycleStart: fields.cycleStart,
       notes: fields.notes.trim(),
       schedule: fields.schedule ?? { type: "daily" },
@@ -289,19 +296,56 @@ export default function AddToStackForm({ peptides, onAdd, onCancel }) {
               </label>
             )}
 
-            <div className="form-row">
-              <label className="form-field">
-                <span className="form-label">Cycle length (days)</span>
+            <fieldset className="form-section">
+              <legend className="form-section-title">Cycle &amp; rest</legend>
+
+              {selected.cycle?.note && (
+                <p className="form-hint muted">{selected.cycle.note}</p>
+              )}
+
+              <label className="form-check">
                 <input
-                  className="form-input"
-                  type="number"
-                  inputMode="numeric"
-                  min="1"
-                  step="1"
-                  value={fields.cycleLengthDays}
-                  onChange={(e) => set("cycleLengthDays", e.target.value)}
+                  type="checkbox"
+                  checked={fields.continuous}
+                  onChange={(e) => set("continuous", e.target.checked)}
                 />
+                <span>Run continuously (no cycling, no rest period)</span>
               </label>
+
+              {fields.continuous ? (
+                <p className="form-hint muted">
+                  This will stay active on your Today list indefinitely — it
+                  never enters a rest period or finishes a cycle.
+                </p>
+              ) : (
+                <div className="form-row">
+                  <label className="form-field">
+                    <span className="form-label">Cycle length (days on)</span>
+                    <input
+                      className="form-input"
+                      type="number"
+                      inputMode="numeric"
+                      min="1"
+                      step="1"
+                      value={fields.cycleLengthDays}
+                      onChange={(e) => set("cycleLengthDays", e.target.value)}
+                    />
+                  </label>
+                  <label className="form-field">
+                    <span className="form-label">Rest days after</span>
+                    <input
+                      className="form-input"
+                      type="number"
+                      inputMode="numeric"
+                      min="0"
+                      step="1"
+                      value={fields.restDays}
+                      onChange={(e) => set("restDays", e.target.value)}
+                    />
+                  </label>
+                </div>
+              )}
+
               <label className="form-field">
                 <span className="form-label">Cycle start</span>
                 <input
@@ -311,7 +355,7 @@ export default function AddToStackForm({ peptides, onAdd, onCancel }) {
                   onChange={(e) => set("cycleStart", e.target.value)}
                 />
               </label>
-            </div>
+            </fieldset>
 
             <label className="form-field">
               <span className="form-label">Notes (optional)</span>
