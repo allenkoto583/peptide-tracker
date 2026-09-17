@@ -56,7 +56,7 @@ All my data saves on my device and survives closing/reopening the app. Keep my h
 
 # Build log & decisions (kept up to date)
 
-_Last updated: September 14, 2026 (added BAC water tracker + off-cycle rest tracking + 2 library peptides)_
+_Last updated: September 16, 2026 (added ARA-290 to the library)_
 
 ## Decisions locked in
 
@@ -114,6 +114,10 @@ _Last updated: September 14, 2026 (added BAC water tracker + off-cycle rest trac
 - [x] **Prerequisite refactor — `stack` lifted into `App.jsx`.** `TodayScreen` and `StackScreen` each called `useLocalStorageState("stack")`, i.e. two independent React states writing one localStorage key. It only worked because tab switching unmounted one screen and remounted the other. Putting "Start next cycle" on Today made Today a *writer*, which would have hit the same class of bug already fixed for `siteDates`. `stack`, `bacWater`, `addItem`/`removeItem`/`updateItem`/`startNextCycle`, and both migrations now live in `App.jsx` (always mounted); the screens take props.
 - **Migration:** one consolidated one-shot effect in `App.jsx` fills only *missing* fields (`== null` checks, never clobbering saved values) — `schedule` defaults to daily, and `restDays`/`continuous` are seeded per-peptide from `peptides.find(p => p.id === item.peptideId)?.cycle`, falling back to 30/false.
 - **Verified in the browser** with seeded data covering every state (active / resting / rest-complete / continuous / legacy-item-with-no-new-fields), plus a 10-case node test of the state machine including the on→rest→complete boundary walk (day 60 active → day 61 rest 1 → day 90 rest 30 → day 91 complete, exactly adjacent). Migration confirmed to preserve `reconDate`, notes, and cycle length. Dose-logging flow re-verified end-to-end after the refactor. No console errors.
+
+### Round 3 (September 16, 2026) — library addition
+
+- [x] **Library — ARA-290 (cibinetide).** 17th entry. Dose range 1–4 mg per injection (the Phase 2 trials used 4 mg SC daily; 8 mg was the studied ceiling), default cycle 28 on / 28 off (28 days on = the trial course length; no break length has been studied, so the off period is a placeholder). Vial 10 mg + 2 mL default. Five PubMed citations verified via the NCBI E-utilities API (Dahan 2013, Culver 2017, Brines 2015, Heij 2012, Brines 2008 PNAS) plus the NCT02039687 trial record. Verified in the browser: alias search ("cibinetide"), detail view, and add-to-stack pre-fill (1 mg → 20 units on a U-100).
 
 ## Status: SHIPPED
 

@@ -876,6 +876,88 @@ export const peptides = [
       },
     ],
   },
+
+  {
+    id: "ara-290",
+    name: "ARA-290",
+    aliases: [
+      "ARA 290",
+      "ARA290",
+      "Cibinetide",
+      "PH-BSP",
+      "Helix B surface peptide",
+      "HBSP",
+    ],
+    category: "Nerve repair / neuropathy (innate repair receptor agonist)",
+    isBlend: false,
+    purpose:
+      "An 11-amino-acid peptide engineered from the helix B surface of erythropoietin (EPO). It activates the tissue-protective \"innate repair receptor\" without EPO's red-blood-cell effects. Studied in Phase 2 trials for small-fiber neuropathy and neuropathic pain in sarcoidosis and type 2 diabetes, where 28 days of daily injections increased corneal nerve fiber density and reduced pain. Investigational; not an approved medication.",
+    vial: {
+      typicalMg: 10,
+      commonMg: [5, 10, 16],
+      reconSolvent: "Bacteriostatic water",
+      reconMl: 2,
+    },
+    dose: {
+      min: 1,
+      max: 4,
+      unit: "mg",
+      perDose: true,
+    },
+    reconstitutionNotes:
+      "Reconstitute with bacteriostatic water added slowly down the vial wall and swirl gently — do not shake. The Phase 2 trials used 4 mg subcutaneously once daily for 28 days; a dose-ranging trial compared 1, 4, and 8 mg/day and found 4 mg gave the largest nerve-fiber response, so 8 mg is the ceiling that has been studied, not a common dose. ARA-290 has a very short plasma half-life (minutes) but its receptor effects are longer-lasting, which is why once-daily dosing was used.",
+    storageNotes:
+      "Refrigerate after reconstitution (about 2–8 °C / 36–46 °F) and protect from light. Lyophilized powder keeps well refrigerated or frozen.",
+    timing:
+      "Timing is flexible; trials did not specify a time of day. Many dose in the evening. Rotate injection sites daily.",
+    frequency:
+      "Once daily in the trials. Some community protocols use every other day or 3× weekly at a lower total dose.",
+    cycleLength:
+      "Trials ran a single 28-day course. Community use commonly runs courses of about 4–8 weeks, then a break before repeating if needed.",
+    cycle: {
+      onDays: 28,
+      offDays: 28,
+      continuous: false,
+      note: "28 days on matches the trial protocol (and the low end of the 4–8 week community range). No break length has been studied; ~4 weeks (28 days) off is offered as a starting point before reassessing.",
+    },
+    shelfLife: {
+      reconstitutedFridgeDays: 30,
+      lyophilizedNote:
+        "Lyophilized powder is stable for months to years when kept cold, dry, and protected from light.",
+      note: "Discard if cloudy, discolored, or past its beyond-use window.",
+    },
+    sources: [
+      {
+        label:
+          "PubMed — ARA 290 improves symptoms in sarcoidosis-associated small nerve fiber loss and increases corneal nerve fiber density (Dahan et al., Mol Med 2013)",
+        url: "https://pubmed.ncbi.nlm.nih.gov/24136731/",
+      },
+      {
+        label:
+          "PubMed — Cibinetide improves corneal nerve fiber abundance in sarcoidosis-associated small nerve fiber loss and neuropathic pain, 1/4/8 mg dose-ranging (Culver et al., IOVS 2017)",
+        url: "https://pubmed.ncbi.nlm.nih.gov/28475703/",
+      },
+      {
+        label:
+          "PubMed — ARA 290 improves metabolic control and neuropathic symptoms in type 2 diabetes (Brines et al., Mol Med 2015)",
+        url: "https://pubmed.ncbi.nlm.nih.gov/25387363/",
+      },
+      {
+        label:
+          "PubMed — Safety and efficacy of ARA 290 in sarcoidosis patients with small fiber neuropathy, pilot study (Heij et al., Mol Med 2012)",
+        url: "https://pubmed.ncbi.nlm.nih.gov/23168581/",
+      },
+      {
+        label:
+          "PubMed — Nonerythropoietic, tissue-protective peptides derived from the tertiary structure of erythropoietin (Brines et al., PNAS 2008)",
+        url: "https://pubmed.ncbi.nlm.nih.gov/18676614/",
+      },
+      {
+        label: "ClinicalTrials.gov — NCT02039687 (ARA 290 Phase 2b, sarcoidosis)",
+        url: "https://clinicaltrials.gov/study/NCT02039687",
+      },
+    ],
+  },
 ];
 
 export default peptides;
